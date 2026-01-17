@@ -1,0 +1,65 @@
+# Veilnova Fetch Node (Docker Compose)
+# RU: Поднимает два сервиса: бот и локальный telegram-bot-api (TDLib).
+# EN: Runs two services: the bot and local telegram-bot-api (TDLib).
+#
+# Dev note / Для разработки:
+# - ./bot:/app монтируется как bind mount, чтобы правки кода применялись сразу.
+# - ./bot:/app is bind-mounted so code changes apply instantly.
+#
+# Prod note / Для продакшена:
+# - Уберите bind mount ./bot:/app, чтобы использовать код, “запечённый” в образ.
+# - Remove ./bot:/app bind mount to use code baked into the image.
+
+services:
+  bot:
+    build:
+      context: ./bot
+      dockerfile: Dockerfile
+    depends_on:
+      telegram-bot-api:
+        condition: service_started
+    environment:
+      BOT_TOKEN: ${BOT_TOKEN}
+      BOT_API_BASE_URL: http://telegram-bot-api:8081
+
+      # общий путь, доступный и боту, и telegram-bot-api
+      DOWNLOAD_DIR: /data
+
+      # cookies внутри контейнера
+      YTDLP_COOKIES: /run/secrets/cookies.txt
+
+      LOG_FILE: /app/bot.log
+      LOG_LEVEL: INFO
+      MAX_FILE_MB: "2000"
+      TG_MAX_UPLOAD_MB: "2000"
+    volumes:
+      - ./bot:/app
+      - data:/data
+      # Unified cookies file for all platforms (read-only)
+      # RU: Единый файл cookies для всех платформ (read-only)
+      # EN: Unified cookies file for all platforms (read-only)
+      - ./secrets/cookies.txt:/run/secrets/cookies.txt:ro
+    restart: unless-stopped
+
+  telegram-bot-api:
+    image: aiogram/telegram-bot-api:latest
+    env_file:
+      - .env
+    environment:
+      TELEGRAM_API_ID: "${TELEGRAM_API_ID}"
+      TELEGRAM_API_HASH: "${TELEGRAM_API_HASH}"
+    command:
+      - "--local"
+      - "--http-port=8081"
+      - "--dir=/var/lib/telegram-bot-api"
+    ports:
+      - "8081:8081"
+    volumes:
+      - tdbotapi_data:/var/lib/telegram-bot-api
+      - data:/data
+    restart: unless-stopped
+
+
+volumes:
+  data:
+  tdbotapi_data:

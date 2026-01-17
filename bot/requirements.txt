@@ -1,0 +1,20 @@
+# Core bot framework / Основной фреймворк бота
+aiogram==3.6.0
+
+# Load .env into environment variables / Подгрузка .env в переменные окружения
+python-dotenv==1.0.1
+
+# yt-dlp with curl-cffi impersonation / yt-dlp с поддержкой impersonation (curl-cffi)
+#
+# RU: TikTok часто ломает extractor в релизах yt-dlp. Поэтому используем master,
+#     чтобы получать фиксы быстрее.
+# EN: TikTok frequently breaks the extractor in yt-dlp stable releases. We use master
+#     to receive fixes sooner.
+#
+# If you need reproducible builds, pin to a specific commit hash instead of "master".
+# Если нужна воспроизводимая сборка — закрепите конкретный commit hash вместо "master".
+yt-dlp[default,curl-cffi] @ git+https://github.com/yt-dlp/yt-dlp.git@master
+
+# gallery-dl is used as fallback for sources where it performs better than yt-dlp.
+# gallery-dl используется как fallback для источников, где он справляется лучше yt-dlp.
+gallery-dl==1.29.7
