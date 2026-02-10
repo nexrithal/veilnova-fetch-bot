@@ -28,6 +28,9 @@ services:
       # cookies внутри контейнера
       YTDLP_COOKIES: /run/secrets/cookies.txt
 
+      YTDLP_REMOTE_COMPONENTS: "ejs:github"
+      YTDLP_YOUTUBE_PLAYER_CLIENT: "web_embedded,web,tv"
+
       LOG_FILE: /app/bot.log
       LOG_LEVEL: INFO
       MAX_FILE_MB: "2000"

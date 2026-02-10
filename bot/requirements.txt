@@ -13,7 +13,7 @@ python-dotenv==1.0.1
 #
 # If you need reproducible builds, pin to a specific commit hash instead of "master".
 # Если нужна воспроизводимая сборка — закрепите конкретный commit hash вместо "master".
-yt-dlp[default,curl-cffi] @ git+https://github.com/yt-dlp/yt-dlp.git@master
+yt-dlp>=2026.02.04
 
 # gallery-dl is used as fallback for sources where it performs better than yt-dlp.
 # gallery-dl используется как fallback для источников, где он справляется лучше yt-dlp.

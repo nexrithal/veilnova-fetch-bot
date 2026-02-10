@@ -164,6 +164,11 @@ def is_tiktok(url: str) -> bool:
     return "tiktok.com" in u or "vt.tiktok.com" in u
 
 
+def is_youtube(url: str) -> bool:
+    u = url.lower()
+    return "youtube.com" in u or "youtu.be" in u
+
+
 def supports_quality_menu(url: str) -> bool:
     """
     Платформы, где имеет смысл давать выбор качества/аудио.
@@ -256,6 +261,16 @@ def yt_dlp_common_args(url: str, cookies_path: Optional[Path]) -> List[str]:
         "--restrict-filenames",
         "--no-progress",
     ]
+
+        # --- YouTube hardening (EJS + avoid web_safari SABR 403) ---
+    if is_youtube(url):
+        # Ensure EJS scripts are available (auto-download)
+        # See yt-dlp wiki: EJS / remote-components
+        args += ["--remote-components", YTDLP_REMOTE_COMPONENTS]
+
+        # Force player clients that are less likely to trigger SABR/web_safari missing URL -> 403
+        args += ["--extractor-args", f"youtube:player_client={YTDLP_YOUTUBE_PLAYER_CLIENT}"]
+
 
     # --- TikTok hardening ---
     if is_tiktok(url):
@@ -843,6 +858,9 @@ DELETE_STATUS_DELAY_SEC = env_int("DELETE_STATUS_DELAY_SEC", 2)
 
 YTDLP_IMPERSONATE = env_str("YTDLP_IMPERSONATE", "chrome")
 YTDLP_FORCE_IPV4 = env_bool("YTDLP_FORCE_IPV4", True)
+
+YTDLP_YOUTUBE_PLAYER_CLIENT = env_str("YTDLP_YOUTUBE_PLAYER_CLIENT", "web_embedded,web,tv")
+YTDLP_REMOTE_COMPONENTS = env_str("YTDLP_REMOTE_COMPONENTS", "ejs:github")
 
 DOWNLOAD_DIR.mkdir(parents=True, exist_ok=True)
 
